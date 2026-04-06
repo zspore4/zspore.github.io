@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projects — Your Name</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f8f7f4; --surface: #ffffff; --text-primary: #1a1a18; --text-secondary: #5a5a55;
+      --text-muted: #9a9a94; --accent: #1a3a5c; --border: #e2e0da;
+      --tag-bg: #eef2f7; --tag-text: #1a3a5c;
+      --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text-primary); font-size: 16px; line-height: 1.7; font-weight: 300; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 200; background: rgba(248,247,244,0.93); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 0 2rem; }
+    .nav-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-logo { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); text-decoration: none; letter-spacing: 0.02em; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: 14px; font-weight: 400; color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.active { color: var(--accent); font-weight: 500; }
+
+    /* PAGE HEADER */
+    .page-header { max-width: 960px; margin: 0 auto; padding: 4rem 2rem 3rem; }
+    .page-header h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 300; letter-spacing: -0.02em; }
+    .page-header h1 em { font-style: italic; color: var(--accent); }
+    .page-header p { margin-top: 0.75rem; color: var(--text-secondary); max-width: 520px; font-size: 1rem; }
+
+    /* FILTER BAR */
+    .filter-bar { max-width: 960px; margin: 0 auto; padding: 0 2rem 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* PROJECT LIST */
+    .projects-list { max-width: 960px; margin: 0 auto; padding: 0 2rem 6rem; display: flex; flex-direction: column; gap: 1px; border-top: 1px solid var(--border); }
+
+    /* PROJECT ROW — collapsed state */
+    .project-row { border-bottom: 1px solid var(--border); }
+    .project-row-header {
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 1rem; align-items: center;
+      padding: 1.5rem 0; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .project-row-header:hover .project-row-title { color: var(--accent); }
+    .project-row-meta { display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+    .project-row-type { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+    .project-row-title { font-size: 1.05rem; font-weight: 500; color: var(--text-primary); transition: color 0.15s; }
+    .project-row-summary { font-size: 0.88rem; color: var(--text-secondary); margin-top: 0.25rem; }
+    .project-row-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+    .tag { background: var(--tag-bg); color: var(--tag-text); font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.04em; }
+    .expand-icon { font-family: var(--mono); font-size: 18px; color: var(--text-muted); transition: transform 0.25s; user-select: none; flex-shrink: 0; }
+    .project-row.open .expand-icon { transform: rotate(45deg); color: var(--accent); }
+
+    /* PROJECT DETAIL PANEL */
+    .project-detail {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .project-row.open .project-detail { max-height: 4000px; }
+    .project-detail-inner { padding: 0 0 2.5rem; }
+
+    /* MEDIA: SLIDESHOW */
+    .slideshow { position: relative; background: #111; border-radius: 8px; overflow: hidden; margin-bottom: 2rem; }
+    .slideshow-track { display: flex; transition: transform 0.4s ease; }
+    .slide { flex: 0 0 100%; }
+    .slide img { width: 100%; max-height: 480px; object-fit: contain; display: block; background: #111; }
+    .slide video { width: 100%; max-height: 480px; display: block; background: #000; }
+    .slide .yt-embed { width: 100%; aspect-ratio: 16/9; }
+    .slide .yt-embed iframe { width: 100%; height: 100%; border: none; display: block; }
+    .slide-placeholder { width: 100%; height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #1a1a1a; color: #555; font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; gap: 0.75rem; }
+    .slide-placeholder svg { opacity: 0.3; }
+    .slideshow-controls { position: absolute; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: linear-gradient(transparent, rgba(0,0,0,0.6)); }
+    .slideshow-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+    .slideshow-btn:hover { background: rgba(255,255,255,0.3); }
+    .slideshow-dots { display: flex; gap: 6px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; transition: background 0.15s; }
+    .dot.active { background: #fff; }
+    .single-media img, .single-media video { width: 100%; border-radius: 8px; max-height: 480px; object-fit: contain; background: #111; display: block; margin-bottom: 2rem; }
+
+    /* DETAIL BODY */
+    .detail-grid { display: grid; grid-template-columns: 1fr 300px; gap: 3rem; align-items: start; }
+    .detail-body h3 { font-size: 0.95rem; font-weight: 500; color: var(--text-primary); margin: 1.5rem 0 0.5rem; }
+    .detail-body h3:first-child { margin-top: 0; }
+    .detail-body p { font-size: 0.93rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .detail-body ul { padding-left: 1.2rem; }
+    .detail-body li { font-size: 0.93rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
+    .detail-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+    .sidebar-block-label { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .sidebar-block p { font-size: 0.88rem; color: var(--text-secondary); }
+    .sidebar-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .detail-links { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.25rem; }
+    .detail-link { font-family: var(--mono); font-size: 12px; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+    .detail-link:hover { text-decoration: underline; }
+
+    @media (max-width: 700px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .filter-bar, .page-header, .projects-list { padding-left: 1rem; padding-right: 1rem; }
+      nav { padding: 0 1rem; }
+      .nav-links { gap: 1rem; } .nav-links a { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">your.name</a>
+    <ul class="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#work">Experience</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Projects —<br><em>things I've built.</em></h1>
+  <p>A mix of capstone work, research, personal builds, and course projects spanning RF, embedded systems, biomedical hardware, and signal processing.</p>
+</div>
+
+<div class="filter-bar">
+  <button class="filter-btn active" data-filter="all">All</button>
+  <button class="filter-btn" data-filter="rf">RF & Communications</button>
+  <button class="filter-btn" data-filter="biomedical">Biomedical</button>
+  <button class="filter-btn" data-filter="embedded">Embedded & FPGA</button>
+  <button class="filter-btn" data-filter="pcb">PCB Design</button>
+  <button class="filter-btn" data-filter="power">Power Electronics</button>
+</div>
+
+<div class="projects-list" id="projects-list">
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: RF RC CAR -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="rf-rc-car" data-tags="rf embedded pcb">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Capstone · Jan 2026 – Present</span>
+        </div>
+        <p class="project-row-title">433 MHz Wireless RF Control System for RC Car</p>
+        <p class="project-row-summary">Custom RF transmitter/receiver chain with QPSK modulation implemented end-to-end in hardware and embedded software.</p>
+        <div class="project-row-tags">
+          <span class="tag">RF</span><span class="tag">QPSK</span><span class="tag">PSoC 6</span><span class="tag">Analog Design</span><span class="tag">ADS</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+
+        <!-- MEDIA: Replace src values with your own image paths or YouTube IDs -->
+        <div class="slideshow" id="ss-rfcar">
+          <div class="slideshow-track">
+            <div class="slide">
+              <div class="slide-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                Add photo: &lt;img src="rfcar-board.jpg"&gt;
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                Add photo: &lt;img src="rfcar-schematic.jpg"&gt;
+              </div>
+            </div>
+            <div class="slide">
+              <!-- YouTube embed example: replace VIDEO_ID -->
+              <div class="yt-embed"><iframe src="about:blank" data-src="https://www.youtube.com/embed/VIDEO_ID?rel=0" allowfullscreen title="RF Car Demo"></iframe></div>
+            </div>
+          </div>
+          <div class="slideshow-controls">
+            <button class="slideshow-btn" onclick="slidePrev('ss-rfcar')">&#8592;</button>
+            <div class="slideshow-dots" id="dots-ss-rfcar"></div>
+            <button class="slideshow-btn" onclick="slideNext('ss-rfcar')">&#8594;</button>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>Overview</h3>
+            <p>This senior capstone project involves designing a complete wireless RF control system operating at 433 MHz. The goal is to build the full signal chain from baseband generation through to motor actuation — avoiding off-the-shelf RF modules in favor of a from-scratch hardware implementation.</p>
+
+            <h3>Transmitter</h3>
+            <ul>
+              <li>DAC-based baseband QPSK signal generation on PSoC 6</li>
+              <li>Analog filtering and upconversion via discrete mixer stages to 433 MHz</li>
+              <li>Amplification and impedance matching to antenna</li>
+            </ul>
+
+            <h3>Receiver</h3>
+            <ul>
+              <li>Low-noise amplification, bandpass filtering, and downconversion</li>
+              <li>QPSK demodulation and timing recovery implemented in embedded software</li>
+              <li>Real-time decoded control output to motor driver and servo subsystems</li>
+            </ul>
+
+            <h3>Embedded System</h3>
+            <ul>
+              <li>PSoC 6 handles baseband generation, timing recovery, and actuator control</li>
+              <li>Integrated with motor control, steering servo, and onboard sensors</li>
+              <li>Custom packet framing and error detection scheme</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Status</p>
+              <p>In progress — Jan 2026 to Present</p>
+            </div>
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Tools & Technologies</p>
+              <div class="sidebar-tags">
+                <span class="tag">Keysight ADS</span><span class="tag">LTSpice</span><span class="tag">PSoC 6</span>
+                <span class="tag">QPSK</span><span class="tag">C/C++</span><span class="tag">Altium</span>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Links</p>
+              <div class="detail-links">
+                <a href="#" class="detail-link">↗ GitHub repository</a>
+                <a href="#" class="detail-link">↗ Project report (PDF)</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: EEG BCI -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="bci" data-tags="biomedical pcb embedded">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Personal · Dec 2024 – Present</span>
+        </div>
+        <p class="project-row-title">8-Channel EEG Brain-Computer Interface</p>
+        <p class="project-row-summary">Custom EEG acquisition PCB with analog amplification and filtering stages targeting neural signal capture for movement intention detection.</p>
+        <div class="project-row-tags">
+          <span class="tag">PCB Design</span><span class="tag">Biomedical</span><span class="tag">DSP</span><span class="tag">Raspberry Pi</span><span class="tag">Altium</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+
+        <div class="slideshow" id="ss-bci">
+          <div class="slideshow-track">
+            <div class="slide">
+              <div class="slide-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                Add photo: &lt;img src="bci-pcb-v1.jpg"&gt;
+              </div>
+            </div>
+            <div class="slide">
+              <div class="slide-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                Add photo: &lt;img src="bci-signal-capture.png"&gt;
+              </div>
+            </div>
+          </div>
+          <div class="slideshow-controls">
+            <button class="slideshow-btn" onclick="slidePrev('ss-bci')">&#8592;</button>
+            <div class="slideshow-dots" id="dots-ss-bci"></div>
+            <button class="slideshow-btn" onclick="slideNext('ss-bci')">&#8594;</button>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>Overview</h3>
+            <p>A personal long-running project to build a non-invasive brain-computer interface from scratch. The first hardware revision used instrumentation amplifier ICs; the current redesign targets custom chopper instrumentation amplifiers to reduce pink noise and improve signal integrity while shrinking board area and cost.</p>
+
+            <h3>Hardware — PCB Design</h3>
+            <ul>
+              <li>8-channel EEG acquisition with per-channel analog amplification and band-pass filtering</li>
+              <li>High-resolution ADC communicating to Raspberry Pi 4B via SPI</li>
+              <li>Current redesign: replacing IA ICs with custom chopper IA topology to improve 1/f noise</li>
+              <li>Compact, battery-powered form factor with EMI shielding considerations</li>
+            </ul>
+
+            <h3>Signal Processing & Software</h3>
+            <ul>
+              <li>SPI-based data acquisition pipeline on Raspberry Pi 4B</li>
+              <li>FIR notch and bandpass filters for powerline rejection and alpha/beta/theta band isolation</li>
+              <li>Exploring wavelet transform decomposition and ML-based movement intention classification</li>
+            </ul>
+
+            <h3>3D Simulation Interface</h3>
+            <ul>
+              <li>Built a 3D avatar control simulation in Unity/C# demonstrating the end-to-end system concept</li>
+              <li>User currently controls avatar via mouse; to be replaced with classified neural signals</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Status</p>
+              <p>Active — v2 PCB under redesign</p>
+            </div>
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Tools & Technologies</p>
+              <div class="sidebar-tags">
+                <span class="tag">Altium</span><span class="tag">Raspberry Pi 4B</span><span class="tag">SPI</span>
+                <span class="tag">Python</span><span class="tag">MATLAB</span><span class="tag">Unity</span><span class="tag">C#</span>
+              </div>
+            </div>
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Links</p>
+              <div class="detail-links">
+                <a href="#" class="detail-link">↗ GitHub repository</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: ECG LAB -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="ecg-lab" data-tags="biomedical embedded pcb">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Research · Sep 2025 – Present</span>
+        </div>
+        <p class="project-row-title">ECG Monitoring Lab Platform Redesign</p>
+        <p class="project-row-summary">Redesigning UW–Madison Computers in Medicine ECG labs with Raspberry Pi Pico 2, full peripheral driver stack, and biomedical DSP pipelines.</p>
+        <div class="project-row-tags">
+          <span class="tag">Embedded C</span><span class="tag">Pico 2</span><span class="tag">ECG</span><span class="tag">DAC</span><span class="tag">BLE</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+        <div class="slideshow" id="ss-ecg">
+          <div class="slideshow-track">
+            <div class="slide">
+              <div class="slide-placeholder">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+                Add photo: &lt;img src="ecg-board.jpg"&gt;
+              </div>
+            </div>
+          </div>
+          <div class="slideshow-controls">
+            <button class="slideshow-btn" onclick="slidePrev('ss-ecg')">&#8592;</button>
+            <div class="slideshow-dots" id="dots-ss-ecg"></div>
+            <button class="slideshow-btn" onclick="slideNext('ss-ecg')">&#8594;</button>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>Overview</h3>
+            <p>Collaborating with faculty to modernize the ECG monitoring lab infrastructure for the Computers in Medicine course, transitioning from Nucleo-F303K8 microcontrollers to Raspberry Pi Pico 2 for improved memory, accessibility, and cost-effectiveness.</p>
+            <h3>Hardware & Drivers</h3>
+            <ul>
+              <li>Designed hardware interfacing 2 DACs, SD card storage, a display, and an ESP32 for BLE communication</li>
+              <li>Wrote low-level embedded C drivers for all peripherals from scratch</li>
+              <li>Designed custom PCB breakout boards for the lab kit</li>
+            </ul>
+            <h3>Software & DSP</h3>
+            <ul>
+              <li>ECG acquisition and monitoring program with local real-time DSP</li>
+              <li>FIR filtering pipeline for artifact rejection and feature extraction</li>
+              <li>Arrhythmia detection algorithms targeting clinical waveform recognition</li>
+            </ul>
+            <h3>Teaching</h3>
+            <ul>
+              <li>Recorded lab tutorial videos and rewrote lab documents for the new platform</li>
+              <li>Teaching sections as Student Assistant — grading, lab prep, student support</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block"><p class="sidebar-block-label">Status</p><p>Active research — ongoing</p></div>
+            <div class="sidebar-block">
+              <p class="sidebar-block-label">Tools & Technologies</p>
+              <div class="sidebar-tags">
+                <span class="tag">Raspberry Pi Pico 2</span><span class="tag">C</span><span class="tag">ESP32</span>
+                <span class="tag">BLE</span><span class="tag">DSP</span><span class="tag">KiCad</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: FPGA SEGWAY -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="fpga-segway" data-tags="embedded">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Course Project</span>
+        </div>
+        <p class="project-row-title">FPGA Segway Control System</p>
+        <p class="project-row-summary">Full FPGA firmware in SystemVerilog implementing SPI, UART, PID control, and balance logic for an autonomous Segway.</p>
+        <div class="project-row-tags">
+          <span class="tag">SystemVerilog</span><span class="tag">FPGA</span><span class="tag">SPI</span><span class="tag">UART</span><span class="tag">PID</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>Overview</h3>
+            <p>Implemented complete FPGA control firmware for a self-balancing Segway platform. All modules — from communication peripherals to closed-loop balance control — were written in SystemVerilog and synthesized to FPGA fabric.</p>
+            <h3>Modules Implemented</h3>
+            <ul>
+              <li>Custom SPI master/slave modules for IMU sensor communication</li>
+              <li>Custom UART module for debug telemetry</li>
+              <li>PID controller for pitch-based balance with tunable gains</li>
+              <li>PWM motor driver with dead-band compensation</li>
+              <li>Top-level state machine integrating all subsystems</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block"><p class="sidebar-block-label">Tools</p><div class="sidebar-tags"><span class="tag">SystemVerilog</span><span class="tag">Quartus</span><span class="tag">ModelSim</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: RF CIRCUIT DESIGN -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="rf-circuits" data-tags="rf">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Course & Personal Projects</span>
+        </div>
+        <p class="project-row-title">RF Circuit Design — LNAs, PAs, Filters, Mixers</p>
+        <p class="project-row-summary">Collection of RF circuit designs simulated in ADS spanning low-noise amplifiers, power amplifiers, matching networks, and filter design.</p>
+        <div class="project-row-tags">
+          <span class="tag">Keysight ADS</span><span class="tag">LNA</span><span class="tag">Impedance Matching</span><span class="tag">S-parameters</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>2.4 GHz LNA for Bluetooth</h3>
+            <ul>
+              <li>Designed microstrip matching and lumped-element bias network for an unconditionally stable low-noise amplifier at 2.4–2.4835 GHz</li>
+              <li>Optimized for noise figure using source/load stability circles and noise figure contours in ADS</li>
+              <li>Smith chart impedance matching at input and output ports</li>
+            </ul>
+            <h3>Additional RF Designs</h3>
+            <ul>
+              <li>Power amplifier design with load-pull contour analysis</li>
+              <li>Active and passive filter design for IF stages</li>
+              <li>Mixer design and conversion gain/IIP3 simulation</li>
+              <li>Oscillator design and phase noise analysis</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block"><p class="sidebar-block-label">Tools</p><div class="sidebar-tags"><span class="tag">Keysight ADS</span><span class="tag">LTSpice</span><span class="tag">CST Studio</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: ANALOG BIOSENSORS -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="biosensors" data-tags="biomedical pcb">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Course Projects</span>
+        </div>
+        <p class="project-row-title">Analog Front-End Biosensor Suite</p>
+        <p class="project-row-summary">Analog front-end circuit designs for ECG, pulse oximetry, and Parkinson's tremor detection with BLE telemetry to a host laptop.</p>
+        <div class="project-row-tags">
+          <span class="tag">Analog Design</span><span class="tag">ECG</span><span class="tag">SpO2</span><span class="tag">BLE</span><span class="tag">Biomedical</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>ECG Acquisition</h3>
+            <p>Instrumentation amplifier based differential front-end with right-leg drive, bandpass filtering, and gain stages to extract cardiac waveform from skin electrodes.</p>
+            <h3>Pulse Oximetry</h3>
+            <p>Dual-wavelength LED drive circuit and transimpedance amplifier stage for photoplethysmography, with DSP-based SpO₂ calculation.</p>
+            <h3>Parkinson's Tremor Detection</h3>
+            <p>Hall effect sensor-based tremor detection circuit with analog filtering targeting the 3–6 Hz Parkinson's tremor frequency band. Real-time BLE streaming to patient laptop for clinician review.</p>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block"><p class="sidebar-block-label">Tools</p><div class="sidebar-tags"><span class="tag">LTSpice</span><span class="tag">Altium</span><span class="tag">BLE</span><span class="tag">MATLAB</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: SCR DIMMER -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="scr-dimmer" data-tags="power">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Personal Project</span>
+        </div>
+        <p class="project-row-title">High Voltage SCR AC Power Dimmer</p>
+        <p class="project-row-summary">Silicon Controlled Rectifier based AC dimmer controlling power flow in high-voltage systems by varying the thyristor firing angle.</p>
+        <div class="project-row-tags">
+          <span class="tag">Power Electronics</span><span class="tag">SCR</span><span class="tag">AC Control</span><span class="tag">Phase Control</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>Overview</h3>
+            <p>Designed, assembled, and tested a high-voltage SCR-based AC dimmer circuit. The system controls power delivered to a resistive load by varying the firing angle of the silicon controlled rectifier, adjusting the point in each AC half-cycle at which current begins to flow.</p>
+            <h3>Key Design Elements</h3>
+            <ul>
+              <li>Zero-crossing detection circuit for synchronizing firing angle to AC mains phase</li>
+              <li>RC phase-shift network and DIAC trigger for gate firing control</li>
+              <li>Snubber network for dV/dt protection and EMI reduction</li>
+              <li>Isolation and safety design for line-voltage operation</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block"><p class="sidebar-block-label">Tools</p><div class="sidebar-tags"><span class="tag">LTSpice</span><span class="tag">Bench Assembly</span><span class="tag">Oscilloscope</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- PROJECT: FORMULA SAE STRAIN GAUGE -->
+  <!-- ================================================================ -->
+  <div class="project-row" id="fsae" data-tags="pcb embedded">
+    <div class="project-row-header" onclick="toggleProject(this)">
+      <div>
+        <div class="project-row-meta">
+          <span class="project-row-type">Formula SAE · 2023–2025</span>
+        </div>
+        <p class="project-row-title">Strain Gauge Amplifier PCB — Formula SAE</p>
+        <p class="project-row-summary">Designed and tested a strain gauge signal conditioning PCB for integration into the UW–Madison FSAE vehicle's central control system.</p>
+        <div class="project-row-tags">
+          <span class="tag">PCB Design</span><span class="tag">Analog</span><span class="tag">Signal Conditioning</span><span class="tag">Wheatstone Bridge</span>
+        </div>
+      </div>
+      <div class="expand-icon">+</div>
+    </div>
+    <div class="project-detail">
+      <div class="project-detail-inner">
+        <div class="detail-grid">
+          <div class="detail-body">
+            <h3>Overview</h3>
+            <p>As part of the Formula SAE electrical team, designed the strain gauge amplifier board used to measure chassis and suspension loads during vehicle testing and competition.</p>
+            <h3>Circuit Design</h3>
+            <ul>
+              <li>Wheatstone bridge excitation and instrumentation amplifier topology for differential strain measurement</li>
+              <li>Low-pass anti-aliasing filter and gain stages for ADC interface</li>
+              <li>PCB designed for high-vibration automotive environment with robust connector selection</li>
+            </ul>
+            <h3>Validation</h3>
+            <ul>
+              <li>Bench validation of noise floor and gain accuracy</li>
+              <li>Contributed to system-level bring-up, debugging, and reflow soldering of vehicle electronics</li>
+            </ul>
+          </div>
+          <div class="detail-sidebar">
+            <div class="sidebar-block"><p class="sidebar-block-label">Tools</p><div class="sidebar-tags"><span class="tag">Altium</span><span class="tag">LTSpice</span><span class="tag">Oscilloscope</span><span class="tag">Reflow Soldering</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end projects-list -->
+
+<script>
+  // ── TOGGLE PROJECT OPEN/CLOSE ──
+  function toggleProject(header) {
+    const row = header.closest('.project-row');
+    const isOpen = row.classList.contains('open');
+    // close all
+    document.querySelectorAll('.project-row.open').forEach(r => r.classList.remove('open'));
+    if (!isOpen) {
+      row.classList.add('open');
+      // lazy-load youtube iframes
+      row.querySelectorAll('iframe[data-src]').forEach(iframe => {
+        iframe.src = iframe.dataset.src;
+        delete iframe.dataset.src;
+      });
+      setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+
+  // ── SLIDESHOW ──
+  const slideshowState = {};
+  function initSlideshow(id) {
+    const container = document.getElementById(id);
+    if (!container) return;
+    const slides = container.querySelectorAll('.slide');
+    if (slides.length <= 1) {
+      const ctrl = container.querySelector('.slideshow-controls');
+      if (ctrl) ctrl.style.display = 'none';
+      return;
+    }
+    slideshowState[id] = 0;
+    const dotsEl = document.getElementById('dots-' + id);
+    dotsEl.innerHTML = '';
+    slides.forEach((_, i) => {
+      const d = document.createElement('span');
+      d.className = 'dot' + (i === 0 ? ' active' : '');
+      d.onclick = () => goToSlide(id, i);
+      dotsEl.appendChild(d);
+    });
+  }
+  function goToSlide(id, idx) {
+    const container = document.getElementById(id);
+    const slides = container.querySelectorAll('.slide');
+    idx = Math.max(0, Math.min(idx, slides.length - 1));
+    slideshowState[id] = idx;
+    container.querySelector('.slideshow-track').style.transform = `translateX(-${idx * 100}%)`;
+    container.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+  function slideNext(id) {
+    const container = document.getElementById(id);
+    const count = container.querySelectorAll('.slide').length;
+    goToSlide(id, ((slideshowState[id] || 0) + 1) % count);
+  }
+  function slidePrev(id) {
+    const container = document.getElementById(id);
+    const count = container.querySelectorAll('.slide').length;
+    goToSlide(id, ((slideshowState[id] || 0) - 1 + count) % count);
+  }
+  // init all slideshows
+  document.querySelectorAll('.slideshow').forEach(ss => initSlideshow(ss.id));
+
+  // ── FILTER ──
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.project-row').forEach(row => {
+        if (filter === 'all') { row.style.display = ''; return; }
+        const tags = row.dataset.tags || '';
+        row.style.display = tags.includes(filter) ? '' : 'none';
+      });
+    });
+  });
+
+  // ── OPEN FROM HASH ──
+  function openFromHash() {
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      const row = document.getElementById(hash);
+      if (row) {
+        const header = row.querySelector('.project-row-header');
+        if (header) toggleProject(header);
+      }
+    }
+  }
+  openFromHash();
+  window.addEventListener('hashchange', openFromHash);
+</script>
+</body>
+</html>

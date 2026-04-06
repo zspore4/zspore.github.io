@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Name — Electrical Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f8f7f4; --surface: #ffffff; --text-primary: #1a1a18; --text-secondary: #5a5a55;
+      --text-muted: #9a9a94; --accent: #1a3a5c; --border: #e2e0da;
+      --tag-bg: #eef2f7; --tag-text: #1a3a5c;
+      --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text-primary); font-size: 16px; line-height: 1.7; font-weight: 300; }
+    nav { position: sticky; top: 0; z-index: 100; background: rgba(248,247,244,0.93); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 0 2rem; }
+    .nav-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-logo { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); text-decoration: none; letter-spacing: 0.02em; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { font-size: 14px; font-weight: 400; color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a.highlight { color: var(--accent); }
+    main { max-width: 860px; margin: 0 auto; padding: 0 2rem; }
+    section { padding: 5rem 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+    .section-label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 2.5rem; }
+    h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 300; letter-spacing: -0.02em; line-height: 1.15; }
+    h1 em { font-style: italic; color: var(--accent); }
+    #about { padding-top: 6rem; }
+    .hero-intro { font-family: var(--mono); font-size: 12px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem; }
+    .hero-bio { margin-top: 2.5rem; max-width: 580px; color: var(--text-secondary); font-size: 1.05rem; line-height: 1.75; }
+    .hero-links { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 0.55rem 1.2rem; font-size: 13px; font-weight: 400; border-radius: 4px; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #0f2a45; }
+    .btn-secondary { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+    .edu-item { display: grid; grid-template-columns: 1fr auto; gap: 0.5rem 2rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); align-items: start; }
+    .edu-item:last-child { border-bottom: none; }
+    .edu-school { font-size: 0.85rem; color: var(--text-muted); font-family: var(--mono); }
+    .edu-degree { font-weight: 500; margin-top: 0.15rem; }
+    .edu-detail { font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.3rem; }
+    .edu-year { font-family: var(--mono); font-size: 12px; color: var(--text-muted); white-space: nowrap; padding-top: 0.2rem; }
+    .work-item { padding: 1.75rem 0; border-bottom: 1px solid var(--border); }
+    .work-item:last-child { border-bottom: none; }
+    .work-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.5rem; }
+    .work-role { font-weight: 500; }
+    .work-company { color: var(--accent); font-size: 0.88rem; margin-top: 0.1rem; font-family: var(--mono); }
+    .work-period { font-family: var(--mono); font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+    .work-desc { margin-top: 0.75rem; color: var(--text-secondary); font-size: 0.93rem; }
+    .work-desc ul { padding-left: 1.2rem; margin-top: 0.4rem; }
+    .work-desc li { margin-bottom: 0.3rem; }
+    .project-preview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 1.25rem; }
+    .project-preview-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-decoration: none; color: inherit; display: block; transition: border-color 0.15s, transform 0.15s; }
+    .project-preview-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .project-type { font-family: var(--mono); font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .project-title { font-size: 1rem; font-weight: 500; color: var(--text-primary); margin-bottom: 0.5rem; }
+    .project-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+    .tag { background: var(--tag-bg); color: var(--tag-text); font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: 3px; letter-spacing: 0.04em; }
+    .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 3rem; }
+    .skill-group-label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .skill-text { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .contact-item { display: flex; flex-direction: column; gap: 2px; }
+    .contact-label { font-family: var(--mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+    .contact-value { font-size: 0.95rem; }
+    .contact-value a { color: var(--accent); text-decoration: none; }
+    .contact-value a:hover { text-decoration: underline; }
+    footer { max-width: 860px; margin: 0 auto; padding: 2rem; font-family: var(--mono); font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; }
+    @media (max-width: 600px) {
+      nav { padding: 0 1rem; } main { padding: 0 1rem; }
+      .nav-links { gap: 1rem; } .nav-links a { font-size: 12px; }
+      .edu-item, .skills-grid, .contact-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; padding: 2rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">your.name</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#education">Education</a></li>
+      <li><a href="#work">Experience</a></li>
+      <li><a href="projects.html" class="highlight">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+<main>
+
+  <section id="about">
+    <p class="hero-intro">Electrical Engineer · UW–Madison · May 2026</p>
+    <h1>Your Name —<br><em>hardware, signals,<br>and systems.</em></h1>
+    <p class="hero-bio">
+      I'm an electrical engineering student at UW–Madison with certificates in Biology in Engineering and Computer Science. My work spans analog front-end design, RF signal chains, embedded DSP, and mixed-signal PCB development — from production hardware at HID Fargo to custom EEG acquisition systems and a 433 MHz RF communication link built from scratch.
+    </p>
+    <div class="hero-links">
+      <a href="mailto:you@email.com" class="btn btn-primary">Get in touch</a>
+      <a href="projects.html" class="btn btn-secondary">View projects</a>
+      <a href="https://linkedin.com/in/yourprofile" class="btn btn-secondary" target="_blank">LinkedIn</a>
+      <a href="https://github.com/yourusername" class="btn btn-secondary" target="_blank">GitHub</a>
+      <a href="resume.pdf" class="btn btn-secondary" target="_blank">Resume ↗</a>
+    </div>
+  </section>
+
+  <section id="education">
+    <p class="section-label">Education</p>
+    <div class="edu-item">
+      <div>
+        <p class="edu-school">University of Wisconsin–Madison, College of Engineering</p>
+        <p class="edu-degree">B.S. Electrical Engineering</p>
+        <p class="edu-detail">Certificates: Biology in Engineering, Computer Science · GPA: 3.42</p>
+      </div>
+      <p class="edu-year">May 2026</p>
+    </div>
+  </section>
+
+  <section id="work">
+    <p class="section-label">Experience</p>
+    <div class="work-item">
+      <div class="work-header">
+        <div><p class="work-role">Electrical Engineering Intern</p><p class="work-company">HID Fargo</p></div>
+        <p class="work-period">May – Aug 2025</p>
+      </div>
+      <div class="work-desc"><ul>
+        <li>Designed and implemented a MagStripe decoding system combining analog front-end circuits, MCU-based DSP, and FPGA bus communication; deployed on production high-density PCB.</li>
+        <li>Redesigned power-loss protection and soft-start circuitry — optimized capacitor selection to prevent volatile memory loss during supply transients.</li>
+        <li>Performed hardware validation, EMC testing in a GTEM cell, and system-level debugging across mixed-signal subsystems.</li>
+        <li>Managed component lifecycle: identified obsolete part replacements, updated BOMs, and maintained integration within Agile PLM.</li>
+      </ul></div>
+    </div>
+    <div class="work-item">
+      <div class="work-header">
+        <div><p class="work-role">Electrical Design Engineering Intern</p><p class="work-company">ArchKey Solutions</p></div>
+        <p class="work-period">May – Aug 2024</p>
+      </div>
+      <div class="work-desc"><ul>
+        <li>Performed load calculations and specified wiring and protection systems for commercial and healthcare facilities per NEC standards.</li>
+        <li>Automated conduit routing workflows using Revit and Dynamo.</li>
+      </ul></div>
+    </div>
+    <div class="work-item">
+      <div class="work-header">
+        <div><p class="work-role">Undergraduate Researcher & Student Assistant</p><p class="work-company">UW–Madison — Computers in Medicine</p></div>
+        <p class="work-period">Sep 2025 – Present</p>
+      </div>
+      <div class="work-desc"><ul>
+        <li>Redesigning ECG monitoring labs, transitioning from Nucleo-F303K8 to Raspberry Pi Pico 2; developed full peripheral driver stack for DACs, SD storage, BLE, and displays.</li>
+        <li>Building ECG acquisition and monitoring software with local DSP pipelines for arrhythmia detection.</li>
+        <li>Teaching lab sections and developing instructional content as Student Assistant.</li>
+      </ul></div>
+    </div>
+    <div class="work-item">
+      <div class="work-header">
+        <div><p class="work-role">Electrical Team Member</p><p class="work-company">Formula SAE — UW–Madison</p></div>
+        <p class="work-period">2023 – 2025</p>
+      </div>
+      <div class="work-desc"><ul>
+        <li>Designed and tested a strain gauge amplifier PCB for integration into the vehicle's central control card.</li>
+        <li>Contributed to debugging, assembly, and validation of electrical subsystems.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <p class="section-label">Featured Projects</p>
+    <div class="project-preview-grid">
+      <a href="projects.html#rf-rc-car" class="project-preview-card">
+        <p class="project-type">Capstone · 2026</p>
+        <p class="project-title">433 MHz Wireless RF Control System</p>
+        <p class="project-desc">Custom RF TX/RX chain with QPSK modulation, DAC baseband, filters, mixers, and embedded timing recovery on PSoC 6 for real-time RC car control.</p>
+        <div class="project-tags"><span class="tag">RF</span><span class="tag">QPSK</span><span class="tag">PSoC 6</span><span class="tag">ADS</span></div>
+      </a>
+      <a href="projects.html#bci" class="project-preview-card">
+        <p class="project-type">Personal · 2024–Present</p>
+        <p class="project-title">8-Channel EEG Brain-Computer Interface</p>
+        <p class="project-desc">Custom EEG PCB with low-noise analog amplification and filtering stages, SPI ADC, and DSP on Raspberry Pi 4B targeting movement intention detection.</p>
+        <div class="project-tags"><span class="tag">PCB Design</span><span class="tag">Biomedical</span><span class="tag">DSP</span><span class="tag">Raspberry Pi</span></div>
+      </a>
+      <a href="projects.html#ecg-lab" class="project-preview-card">
+        <p class="project-type">Research · 2025–Present</p>
+        <p class="project-title">ECG Lab Platform Redesign</p>
+        <p class="project-desc">Redesigned Computers in Medicine ECG lab infrastructure using Pico 2 with full peripheral driver stack and biomedical DSP pipelines for student labs.</p>
+        <div class="project-tags"><span class="tag">Embedded C</span><span class="tag">Pico 2</span><span class="tag">ECG</span><span class="tag">BLE</span></div>
+      </a>
+      <a href="projects.html" class="project-preview-card" style="border-style: dashed; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; min-height: 160px;">
+        <p class="project-type" style="margin-bottom: 0.5rem;">All Projects</p>
+        <p class="project-title" style="color: var(--accent);">View full project library →</p>
+        <p class="project-desc" style="margin-top: 0.5rem;">FPGA Segway, RF circuit design, analog biosensors, SCR dimmer, and more.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="skills">
+    <p class="section-label">Core Skills</p>
+    <div class="skills-grid">
+      <div>
+        <p class="skill-group-label">RF & Communications</p>
+        <p class="skill-text">Transmission lines, impedance matching, Smith chart, S-parameters, LNAs, PAs, mixers, filters, QPSK/BPSK/QAM, BLE, link budgets · Keysight ADS, LTSpice, CST Studio</p>
+      </div>
+      <div>
+        <p class="skill-group-label">Embedded Systems</p>
+        <p class="skill-text">C/C++, Verilog/SystemVerilog, real-time systems, SPI/I²C/UART, FreeRTOS, Python · STM32, PSoC 6, Raspberry Pi, FPGA</p>
+      </div>
+      <div>
+        <p class="skill-group-label">Hardware Design</p>
+        <p class="skill-text">Mixed-signal PCB layout (Altium, KiCad), analog front-end design, power electronics, schematic capture, EMC & signal integrity</p>
+      </div>
+      <div>
+        <p class="skill-group-label">DSP & Software</p>
+        <p class="skill-text">FIR/IIR filtering, FFT, wavelet transforms, noise reduction, feature extraction · MATLAB, Python, Java, Linux, AutoCAD, Unity</p>
+      </div>
+      <div>
+        <p class="skill-group-label">Lab & Validation</p>
+        <p class="skill-text">Oscilloscopes, spectrum/network analyzers, EMC/GTEM testing, PCB bring-up, reflow & precision soldering, breadboarding</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <p class="section-label">Contact</p>
+    <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 480px;">
+      Graduating May 2026 and actively looking for full-time roles in hardware, RF, or embedded systems engineering. Feel free to reach out.
+    </p>
+    <div class="contact-grid">
+      <div class="contact-item"><span class="contact-label">Email</span><span class="contact-value"><a href="mailto:you@email.com">you@email.com</a></span></div>
+      <div class="contact-item"><span class="contact-label">LinkedIn</span><span class="contact-value"><a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a></span></div>
+      <div class="contact-item"><span class="contact-label">GitHub</span><span class="contact-value"><a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a></span></div>
+      <div class="contact-item"><span class="contact-label">Location</span><span class="contact-value">Madison, WI</span></div>
+    </div>
+  </section>
+
+</main>
+<footer>
+  <span>© 2026 Your Name</span>
+  <span>Electrical Engineer · UW–Madison</span>
+</footer>
+</body>
+</html>
